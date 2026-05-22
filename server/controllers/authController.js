@@ -106,6 +106,10 @@ export const sendVerifyOtp = async (req, res) => {
 
         const user = await userModel.findById(userId);
 
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
         if (user.isAccountVerified) {
             return res.status(400).json({ success: false, message: "User already verified" });
         }
@@ -130,6 +134,15 @@ export const sendVerifyOtp = async (req, res) => {
         return res.status(200).json({ success: true, message: "Verification OTP sent successfully" });
 
     } catch (error) {
+        console.error('Send verification OTP error:', error);
+
+        if (error.code || error.command || error.responseCode) {
+            return res.status(502).json({
+                success: false,
+                message: "Unable to send verification email. Check SMTP credentials and sender settings."
+            });
+        }
+
         return res.status(500).json({ success: false, message: error.message });
     }
 
@@ -258,5 +271,4 @@ export const resetPassword = async (req, res) => {
         
     }
 }
-
 

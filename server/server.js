@@ -1,12 +1,10 @@
+import "./config/env.js";
 import express from "express";
 import cors from "cors";
-import 'dotenv/config';
 import cookieParser from "cookie-parser";
 import connectDB from "./config/mongodb.js";
 import authRoute from "./routes/authRoutes.js";
 import userRoute from "./routes/userRoutes.js";
-import dotenv from "dotenv";
-dotenv.config();
 
 
 const app = express();
@@ -16,7 +14,9 @@ connectDB();
 
 const allowedOrigins = [
     'http://localhost:5173',
-    'https://your-production-website.com'
+    'http://localhost:5174',
+    'https://your-production-website.com',
+    ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(origin => origin.trim()) : [])
 ];
 
 app.use(express.json());
@@ -24,7 +24,6 @@ app.use(cookieParser());
 app.use(cors({
     origin: allowedOrigins,
     credentials: true,
-
 }));
 
 // Api Endpoints
@@ -37,4 +36,5 @@ app.use('/api/user', userRoute);
 
 app.listen(PORT, () => {
     console.log(`You goddamn right http://localhost:${PORT}`);
+    console.log(`SMTP user: ${process.env.SMTP_USER || "not configured"}`);
 });

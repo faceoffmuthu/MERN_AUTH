@@ -12,19 +12,23 @@ export const AppContextProvider = (props) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(false)
 
-    const getAuthState = async()=>{
+    const getAuthState = async () => {
         try {
-            const {data} = await axios.get(backendUrl + '/api/auth/is-auth')
-            if(data.success){
+            const { data } = await axios.get(backendUrl + '/api/auth/is-auth')
+            if (data.success) {
                 setIsLoggedIn(true)
                 getUserData()
             }
-            
+
         } catch (error) {
-            console.error('Error in getUserData:', error);
-            toast.error(error.response?.data?.message || 'Error fetching user data');
-            throw error; // Re-throw to handle in components if needed
-            
+            if (error.response?.status === 401) {
+                setIsLoggedIn(false)
+                setUserData(false)
+                return
+            }
+
+            console.error('Error in getAuthState:', error);
+            toast.error(error.response?.data?.message || 'Error checking auth state');
         }
     }
 
@@ -34,10 +38,14 @@ export const AppContextProvider = (props) => {
             data.success ? setUserData(data.userData) : toast.error(data.message)
 
         } catch (error) {
+            if (error.response?.status === 401 || error.response?.status === 400) {
+                setIsLoggedIn(false)
+                setUserData(false)
+                return
+            }
+
             console.error('Error in getUserData:', error);
             toast.error(error.response?.data?.message || 'Error fetching user data');
-            throw error; // Re-throw to handle in components if needed
-
         }
     }
 

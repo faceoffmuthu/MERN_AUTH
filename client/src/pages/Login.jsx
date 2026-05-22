@@ -17,6 +17,13 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const switchState = (nextState) => {
+        setState(nextState)
+        setName('')
+        setEmail('')
+        setPassword('')
+    }
+
     const handleSubmit = async (e) => {
         try {
             e.preventDefault()
@@ -29,7 +36,7 @@ const Login = () => {
 
             if(data.success){
                 setIsLoggedIn(true)
-                getUserData()
+                await getUserData()
                 navigate('/')
             }
             else{
@@ -42,7 +49,7 @@ const Login = () => {
 
             if(data.success){
                 setIsLoggedIn(true)
-                getUserData()
+                await getUserData()
                 navigate('/')
             }
             else{
@@ -66,12 +73,13 @@ const Login = () => {
                 <h2 className='text-3xl font-semibold text-white text-center mb-3'>{state === 'Sign up' ? 'Create Account' : 'Login'}</h2>
                 <p className='text-center text-sm mb-6'>{state === 'Sign up' ? 'Create your Account' : 'Login to your account!'}</p>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} autoComplete={state === 'Sign up' ? 'off' : 'on'}>
                     {state === 'Sign up' && (
                         <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
                             <img src={person_icon} alt="" />
                             <input value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                autoComplete='name'
                                 className='bg-transparent outline-none' type="text"
                                 placeholder='Full Name' required />
                         </div>
@@ -80,6 +88,7 @@ const Login = () => {
                         <img src={mail_icon} alt="" />
                         <input value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            autoComplete={state === 'Sign up' ? 'off' : 'email'}
                             className='bg-transparent outline-none' type="email"
                             placeholder='Enter your Email' required />
                     </div>
@@ -88,6 +97,7 @@ const Login = () => {
                         <PasswordInput 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
+                          autoComplete={state === 'Sign up' ? 'new-password' : 'current-password'}
                           placeholder="Enter your password"
                           required
                         />
@@ -98,9 +108,9 @@ const Login = () => {
                     <button className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium cursor-pointer'>{state}</button>
                 </form>
                 {state === 'Sign up' ? (<p className='text-gray-400 text-center text-xs mt-4'>Already have an account?{''}
-                    <span onClick={() => setState('Login')} className='text-blue-400 cursor-pointer underline'>Login here</span></p>)
+                    <span onClick={() => switchState('Login')} className='text-blue-400 cursor-pointer underline'>Login here</span></p>)
                     : (<p className='text-gray-400 text-center text-xs mt-4'>Don't have an account?{''}
-                        <span onClick={() => setState('Sign up')} className='text-blue-400 cursor-pointer underline'>Sign up here</span></p>)}
+                        <span onClick={() => switchState('Sign up')} className='text-blue-400 cursor-pointer underline'>Sign up here</span></p>)}
 
 
             </div>
